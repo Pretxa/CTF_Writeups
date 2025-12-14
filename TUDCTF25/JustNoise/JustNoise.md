@@ -95,7 +95,7 @@ static void choose_pos(size_t idx, int w, int h, int *x, int *y){
     *y = (int)yy;
 }
 ```
-Here, the `choose_pos()` function decides whcih pixel will store the character.
+Here, the `choose_pos()` function decides which pixel will store the character.
 
 Things to consider:
 1. Position depends on the image index `i`
@@ -230,4 +230,5 @@ Flag: TUDCTF{R3dCh4nn3l_C43s4r_1n_Tr4tt0r14}
 ```
 TUDCTF{R3dCh4nn3l_C43s4r_1n_Tr4tt0r14}
 ```
+
 Voila! Ta-da! Presto! ^_^
