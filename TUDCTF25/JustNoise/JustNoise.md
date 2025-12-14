@@ -106,7 +106,7 @@ We will use these formula for reversing.
 
 
 
-Stage 3: Caesar Cipher Rotation
+### Stage 3: Caesar Cipher Rotation
 ```C
 /* per-index rotation amount 0..25 (no seed) */
 static int rot_for_idx(size_t idx){
@@ -132,7 +132,7 @@ This is Caeser Cipher, meaning:
 
 To reverse this, we simply rotate backwards by the same amount.
 
-Stage 4: Store character in the image
+### Stage 4: Store character in the image
 ```C
 size_t off = ((size_t)y * (size_t)W + (size_t)x) * 3;
 buf[off + 0] = rc;  // R channel holds the rotated ASCII
@@ -147,7 +147,7 @@ The C program stores the rotated character at:
 
 If you try to view the image there will be no apparent difference.
 
-Stage 5: Write to PPM File
+### Stage 5: Write to PPM File
 ```C
 fprintf(f, "P6\n%d %d\n255\n", W, H);
 fwrite(buf, 1, img_bytes, f);
@@ -158,21 +158,28 @@ The PPM format is pretty simple:
 2. Followed by dumping all the pixel data. Each image gets a numbered filename like img_000.ppm, img_001.ppm, etc., so you know what order to read them in when decoding.
 
 
-Stage 5: Reversing the Process
+## Step 3: Reversing the Process
 
 So in order for us to retrieve the flag, we need to:
 1.  Loop through all images in order
+    `img_000.ppm`, `img_001.ppm`, `img_002.ppm`, ...
 2. Replicate the `choose_pos()` function using the index $i$ to determine the exact $(x, y)$ coordinates where the secret character is stored in the current image.
   
     - $$x = (i \cdot 73 + i^2 \cdot 19 + 17) \pmod{128}$$
     - $$y = (i \cdot 131 + i^2 \cdot 7 + 23) \pmod{128}$$
 
+    This tells us exactly which pixel contains the hidden data.
+
 3. Extract the Rotated Character: Open the image and read the color value from the Red channel (the first channel, index 0) at the calculated $(x, y)$ coordinates. This value, $rc$, is the rotated ASCII character.
+
+    `rc` = rotated character (still encrypted)
+
 
 4. Replicate the `rot_for_idx()` function using the index $i$ to determine the original Caesar cipher shift $r$ applied to the character.
 
     - $$r = (i \cdot 7 + i^2 \cdot 3 + 5) \pmod{26}$$
-5. Apply the reverse Caesar cipher shift to $rc$. Since the original rotation was $r$, the decryption shift is $26 - r$. This recovers the original flag character $c$.
+    
+5. Apply the reverse Caesar cipher shift to $rc$ to get the original character $c$. Rotating backwards by `r` is the same as rotating forward by `26-r`. For example, if a character was rotated by `3`, we rotated it backward by `3` (or forward by `23`)
 
 6. Append the recovered character $c$ to the final flag string.
 
